@@ -9,7 +9,7 @@
 (in-package :cl-gearman-asd)
 
 (defsystem cl-gearman
-  :version "0.1"
+  :version "0.0.1"
   :author "Takayuki Sato"
   :license "LLGPL"
   :depends-on (:usocket :split-sequence :babel :alexandria)
@@ -24,7 +24,7 @@
                          (:file "client")
                          (:file "worker"))))
   
-  :description ""
+  :description "Common Lisp Library for the Gearman distributed job system."
   :long-description
   #.(with-open-file (stream (merge-pathnames
                              #p"README.markdown"
