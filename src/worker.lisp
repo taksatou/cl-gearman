@@ -114,7 +114,7 @@
 
 (defmacro with-worker ((var host) &body body)
   (alexandria:with-gensyms ()
-    `(let ((,var (make-worker '(,host))))
+    `(let ((,var (make-worker (list ,host))))
        ,@body
        (close-worker ,var))))
 

@@ -103,7 +103,7 @@
 
 (defmacro with-client ((var host) &body body)
   (alexandria:with-gensyms ()
-    `(let ((,var (make-client '(,host))))
+    `(let ((,var (make-client (list ,host))))
        ,@body
        (close-client ,var))))
 
