@@ -33,6 +33,7 @@ Please see examples for detail.
 - sbcl
 - clisp
 - clozure cl
+- allegro cl
 
 ## Author
 
