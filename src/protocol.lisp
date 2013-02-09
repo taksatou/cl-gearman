@@ -7,9 +7,6 @@
 
 ;; http://gearman.org/doku.php?id=protocol
 
-(defconstant +request-magic+ #(0 82 69 81)) ;  \0REQ
-(defconstant +response-magic+ #(0 82 69 83)) ; \0RES
-
 (defconstant CAN_DO 1)  ;;              REQ    Worker
 (defconstant CANT_DO 2)  ;;             REQ    Worker
 (defconstant RESET_ABILITIES 3)  ;;     REQ    Worker
@@ -53,7 +50,10 @@
 (defconstant SUBMIT_JOB_SCHED 35)  ;;    REQ    Client
 (defconstant SUBMIT_JOB_EPOCH 36)  ;;    REQ    Client
 
-(defconstant +name-table+ (let ((h (make-hash-table)))
+(defparameter +request-magic+ #(0 82 69 81)) ;  \0REQ
+(defparameter +response-magic+ #(0 82 69 83)) ; \0RES
+
+(defparameter +name-table+ (let ((h (make-hash-table)))
                             (setf (gethash CAN_DO h) :CAN_DO)
                             (setf (gethash CANT_DO h) :CANT_DO)
                             (setf (gethash RESET_ABILITIES h) :RESET_ABILITIES)
