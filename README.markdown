@@ -4,9 +4,10 @@ Common Lisp Library for the Gearman distributed job system.
 
 ## Installation
 
+cl-gearman is available on quicklisp.
+
 ```
-cd ~/quicklisp/local-projects
-git clone https://github.com/taksatou/cl-gearman.git
+(ql:quickload 'cl-gearman)
 ```
 
 ## Usage
