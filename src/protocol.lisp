@@ -28,7 +28,7 @@
 (defconstant ECHO_REQ 16)  ;;            REQ    Client/Worker
 (defconstant ECHO_RES 17)  ;;            RES    Client/Worker
 (defconstant SUBMIT_JOB_BG 18)  ;;       REQ    Client
-(defconstant ERROR 19)  ;;               RES    Client/Worker
+(defconstant G_ERROR 19)  ;;               RES    Client/Worker
 (defconstant STATUS_RES 20)  ;;          RES    Client
 (defconstant SUBMIT_JOB_HIGH 21)  ;;     REQ    Client
 (defconstant SET_CLIENT_ID 22)  ;;       REQ    Worker
@@ -71,7 +71,7 @@
                             (setf (gethash ECHO_REQ h) :ECHO_REQ)
                             (setf (gethash ECHO_RES h) :ECHO_RES)
                             (setf (gethash SUBMIT_JOB_BG h) :SUBMIT_JOB_BG)
-                            (setf (gethash ERROR h) :ERROR)
+                            (setf (gethash G_ERROR h) :G_ERROR)
                             (setf (gethash STATUS_RES h) :STATUS_RES)
                             (setf (gethash SUBMIT_JOB_HIGH h) :SUBMIT_JOB_HIGH)
                             (setf (gethash SET_CLIENT_ID h) :SET_CLIENT_ID)
