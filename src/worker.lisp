@@ -32,9 +32,13 @@
     worker))
 
 (defmethod select-server ((w worker) (j job))
-  "TODO"
+  "Select the first server ready to response, if some connection error appears the server is
+automatically discarded"
   (with-slots (connections) w
-    (car connections)))
+    (find-if
+     (lambda (conn)
+       (is-active conn))
+     connections)))
 
 (defmethod tell-job-fail ((w worker) (j job))
     (with-slots (handle) j
@@ -72,8 +76,9 @@
                              (make-instance 'message :name CAN_DO_TIMEOUT :data (list name (format nil "~d" timeout)))
                              (make-instance 'message :name CAN_DO :data (list name)))))
       (loop for conn in connections
-         do (with-reconnect-restart conn
-              (send-request conn cando-message))))
+         do (and (is-active conn)
+                 (with-reconnect-restart conn
+                   (send-request conn cando-message)))))
     (setf (gethash name abilities) func) nil))
 
 (defmethod remove-ability ((w worker) name)
@@ -81,16 +86,18 @@
   (with-slots (abilities connections) w
     (let ((cantdo-message (make-instance 'message :name CANT_DO :data (list name))))
       (loop for conn in connections
-         do (with-reconnect-restart conn
-              (send-request conn cantdo-message))))
+         do (and (is-active conn)
+                 (with-reconnect-restart conn
+                   (send-request conn cantdo-message)))))
     (remhash name abilities)))
 
 (defmethod reset-abilities ((w worker))
   (with-slots (abilities connections) w
     (let ((reset-message (make-instance 'message :name RESET_ABILITIES)))
       (loop for conn in connections
-         do (with-reconnect-restart conn
-              (send-request conn reset-message))))
+         do (and (is-active conn)
+                 (with-reconnect-restart conn
+                   (send-request conn reset-message)))))
     (setf abilities (make-hash-table :test #'equalp))))
 
 (defmethod work ((w worker))
@@ -118,3 +125,8 @@
        ,@body
        (close-worker ,var))))
 
+(defmacro with-multiple-servers-worker ((var hosts) &body body)
+  (alexandria:with-gensyms ()
+    `(let ((,var (make-worker ,hosts)))
+       ,@body
+       (close-worker ,var))))

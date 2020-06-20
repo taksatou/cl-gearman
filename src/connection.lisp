@@ -35,7 +35,10 @@ MESSAGE and COMMENT offering a :reconnect restart given by RESTART."
                         :comment ,comment)
      (reconnect ()
        :report "Try to reconnect."
-       ,restart)))
+       ,restart)
+     (skip-connection ()
+       :report "Skip connection attempt."
+       nil)))
 
 (defmacro provide-reconnect-restart (expression &body body)
   "When, during the execution of EXPRESSION, an error occurs that can break
@@ -119,3 +122,11 @@ restart."
     (let ((msg (read-message stream)))
       (log-debug (format nil "received response: ~a" msg))
       msg)))
+
+(defmethod is-active ((conn connection))
+  (handler-case (progn
+                  (send-request conn (make-instance 'message :name ECHO_REQ :data (list "test-connection")))
+                  (let ((msg (recv-response conn)))
+                    (message-name? msg ECHO_RES)))
+    (error (err)
+      (log-debug err) nil)))
