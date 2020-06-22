@@ -28,9 +28,18 @@
     client))
 
 (defmethod select-server ((cli client) uid)
-  "TODO"
+  "Select the first server ready to response, if some connection error appears the server is
+automatically discarded"
   (with-slots (connections) cli
-    (car connections)))
+    (find-if
+     (lambda (conn)
+       (handler-case (progn
+                       (send-request conn (make-instance 'message :name ECHO_REQ :data (list "test-connection")))
+                       (let ((msg (recv-response conn)))
+                         (message-name? msg ECHO_RES)))
+         (error (err)
+           (log-debug err) nil)))
+     connections)))
 
 (defmethod submit-job ((cli client) func &key arg priority)
   "Submit a job and return result data of the job. This function blocks until it is completed."
@@ -107,3 +116,8 @@
        ,@body
        (close-client ,var))))
 
+(defmacro with-multiple-servers-client ((var hosts) &body body)
+  (alexandria:with-gensyms ()
+    `(let ((,var (make-client ,hosts)))
+       ,@body
+       (close-client ,var))))

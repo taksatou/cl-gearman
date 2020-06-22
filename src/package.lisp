@@ -16,6 +16,7 @@
    #:get-job-status
    #:close-client
    #:with-client
+   #:with-multiple-servers-client
 
    ;; worker
    #:worker
@@ -26,6 +27,7 @@
    #:work
    #:close-worker
    #:with-worker
+   #:with-multiple-servers-worker
    #:skip-job
    #:abort-job
    #:retry-job
@@ -40,5 +42,5 @@
    #:log-warn
    #:log-error
    #:log-fatal
-   
+
    ))
