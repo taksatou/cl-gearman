@@ -1,3 +1,5 @@
+(ql:quickload :cl-gearman)
+
 (cl-gearman:with-worker (worker "localhost:4730") 
   (cl-gearman:add-ability worker "hello"
                           #'(lambda (arg job) "hello"))

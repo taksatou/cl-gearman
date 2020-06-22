@@ -1,3 +1,5 @@
+(ql:quickload :cl-gearman)
+
 (cl-gearman:with-client (client "localhost:4730")
   ;; simple example
   (format t "~a~%" (cl-gearman:submit-job client "hello"))
