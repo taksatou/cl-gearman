@@ -2,7 +2,7 @@
 ;; docker run --rm -p 4730:4730 artefactual/gearmand:1.1.19.1-alpine
 ;; docker run --rm -p 4731:4730 artefactual/gearmand:1.1.19.1-alpine
 
-;; 1) Test with two servers
+;; 1) Test with two servers active
 ;; 2) Shutdown the first server and check that still got the answer to the client side
 
 (ql:quickload :cl-gearman)
@@ -26,16 +26,19 @@
   (cl-gearman:add-ability wx "task1" lisp-info)
   (cl-gearman:add-ability wx "task2" reverse!)
 
-  (loop do (handler-bind ((error #'(lambda (c) (invoke-restart 'cl-gearman:skip-job))))
-             (cl-gearman:work wx))))
+  (loop
+     do (handler-case (cl-gearman:work wx)
+          (error (c)
+            (format t "Worker lost because of error ~a , please restart this connection ~%" c)))))
 
 
 ;; client side
 
-(cl-gearman:with-multiple-servers-client (client *servers*)
-  (format t "~A"
-          (cl-gearman:submit-job client "task1"
-                                 :arg ""))
+(handler-bind ((error #'(lambda (c) (invoke-restart 'cl-gearman::skip-connection))))
+  (cl-gearman:with-multiple-servers-client (client *servers*)
     (format t "~A"
-          (cl-gearman:submit-job client "task2"
-                                 :arg "Hello Lisp World2!")))
+            (cl-gearman:submit-job client "task1"
+                                   :arg ""))
+    (format t "~A"
+            (cl-gearman:submit-job client "task2"
+                                   :arg "Hello Lisp World!"))))
