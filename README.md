@@ -27,7 +27,30 @@ cl-gearman is available on quicklisp.
 
 ```
 
-Please see examples for detail.
+## Example
+
+Run gearman server,
+
+```
+docker run --rm -p 4730:4730 artefactual/gearmand:1.1.19.1-alpine
+```
+
+and then,
+
+```
+# start worker process
+sbcl --script examples/worker.lisp
+
+# start client process
+sbcl --script examples/client.lisp
+```
+
+## Local development with quicklisp
+
+```
+ln -s path/to/cl-gearman-repo ~/quicklisp/local-projects/cl-gearman
+```
+
 
 ## lisp
 
