@@ -9,7 +9,7 @@
 (in-package :cl-gearman-asd)
 
 (defsystem cl-gearman
-  :version "0.0.1"
+  :version "0.0.2"
   :author "Takayuki Sato"
   :license "LLGPL"
   :depends-on (:usocket :split-sequence :babel :alexandria)
