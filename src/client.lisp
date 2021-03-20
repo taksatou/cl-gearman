@@ -111,13 +111,13 @@ automatically discarded"
     (loop for conn in connections do (gm-close conn))))
 
 (defmacro with-client ((var host) &body body)
-  (alexandria:with-gensyms ()
-    `(let ((,var (make-client (list ,host))))
-       ,@body
+  `(let ((,var (make-client (list ,host))))
+     (unwind-protect
+          (progn ,@body)
        (close-client ,var))))
 
 (defmacro with-multiple-servers-client ((var hosts) &body body)
-  (alexandria:with-gensyms ()
-    `(let ((,var (make-client ,hosts)))
-       ,@body
+  `(let ((,var (make-client ,hosts)))
+     (unwind-protect
+          (progn ,@body)
        (close-client ,var))))

@@ -112,21 +112,28 @@ automatically discarded"
     (let ((conn (select-server w (make-instance 'job :handle "" :name "" :arg nil)))) ; dummy job
       ;; TODO : retry
       ;;   To support retry, add-ability is needed. with-reconnect-restart is not enough...
-      (let ((job (grab-job conn)))
-        (handle-job-assign w job)))))
+      ;;
+      ;; When previous job was timed out on the server,
+      ;; it will respond ERROR on our ECHO_REQ in `is-active` and
+      ;; `select-server` will might return NIL.
+      ;; That is why we need to run `grab-job` only
+      ;; if connection was found:
+      (when conn
+        (let ((job (grab-job conn)))
+          (handle-job-assign w job))))))
 
 (defmethod close-worker ((w worker))
   (with-slots (connections) w
     (loop for conn in connections do (gm-close conn))))
 
 (defmacro with-worker ((var host) &body body)
-  (alexandria:with-gensyms ()
-    `(let ((,var (make-worker (list ,host))))
-       ,@body
+  `(let ((,var (make-worker (list ,host))))
+     (unwind-protect
+          (progn ,@body)
        (close-worker ,var))))
 
 (defmacro with-multiple-servers-worker ((var hosts) &body body)
-  (alexandria:with-gensyms ()
-    `(let ((,var (make-worker ,hosts)))
-       ,@body
+  `(let ((,var (make-worker ,hosts)))
+     (unwind-protect
+          (progn ,@body)
        (close-worker ,var))))
