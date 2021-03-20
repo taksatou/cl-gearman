@@ -120,13 +120,13 @@ automatically discarded"
     (loop for conn in connections do (gm-close conn))))
 
 (defmacro with-worker ((var host) &body body)
-  (alexandria:with-gensyms ()
-    `(let ((,var (make-worker (list ,host))))
-       ,@body
+  `(let ((,var (make-worker (list ,host))))
+     (unwind-protect
+          (progn ,@body)
        (close-worker ,var))))
 
 (defmacro with-multiple-servers-worker ((var hosts) &body body)
-  (alexandria:with-gensyms ()
-    `(let ((,var (make-worker ,hosts)))
-       ,@body
+  `(let ((,var (make-worker ,hosts)))
+     (unwind-protect
+          (progn ,@body)
        (close-worker ,var))))
