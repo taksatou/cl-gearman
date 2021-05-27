@@ -11,7 +11,7 @@
     :initform nil)
    (abilities
     :initform (make-hash-table :test #'equalp)
-    :accessor :abilities)
+    :accessor abilities)
    (status
     :initform :preparing
     :reader status
