@@ -21,7 +21,11 @@
     :initform nil
     :accessor gm-stream)))
 
-(define-condition gearman-connection-error (error) ())
+(define-condition gearman-connection-error (error) 
+  ((message :initarg :message
+            :initform nil)
+   (comment :initarg :comment
+            :initform nil)))
 
 ;;
 ;; macros borrowed from cl-redis
