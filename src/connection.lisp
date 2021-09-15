@@ -109,9 +109,6 @@ restart."
 (defmethod initialize-instance :after ((conn connection) &key)
   (gm-connect conn))
 
-(defgeneric send-request (conn packet)
-  (:documentation "send request"))
-
 (defun send-request (conn msg)
   (with-slots (stream) conn
     (write-message stream msg))
