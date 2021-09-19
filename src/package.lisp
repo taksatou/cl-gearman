@@ -28,9 +28,12 @@
    #:close-worker
    #:with-worker
    #:with-multiple-servers-worker
+   #:job-failed
+   #:server-response
    #:skip-job
    #:abort-job
    #:retry-job
+   #:accept-job
 
 
    ;; misc
