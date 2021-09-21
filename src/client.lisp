@@ -41,6 +41,13 @@ automatically discarded"
            (log-debug err) nil)))
      connections)))
 
+(define-condition job-failed (error)
+  ((response :initarg :response
+             :reader server-response))
+  (:report (lambda (condition stream)
+             (format stream "job failed: ~A"
+                     (server-response condition)))))
+
 (defmethod submit-job ((cli client) func &key arg priority)
   "Submit a job and return result data of the job. This function blocks until it is completed."
   (let* ((uid (make-uid))
@@ -51,23 +58,23 @@ automatically discarded"
     (with-reconnect-restart conn
       (send-request conn (make-instance 'message :name type :data (list func uid arg)))
       (loop for msg = (recv-response conn)
-         do (cond ((message-name? msg JOB_CREATED)
-                   ;; nothing todo
-;                 (log-debug (format nil "job created: ~A" msg))
-                   )
-                  ((message-name? msg WORK_COMPLETE)
-;                 (log-debug (format nil "job complete: ~A" msg))
-                   (return (cadr (slot-value msg 'data))))
-                  ((message-name? msg WORK_FAIL)
-                   (restart-case (error (format nil "job failed: ~A" msg))
-                     (retry ()
-                       :report (lambda (stream) (format stream "Retry the job."))
-                       (submit-job cli func :arg arg :priority priority))
-                     (accept ()
-                       :report (lambda (stream) (format stream "Continue, treating the job has successed."))
-                       (return nil))))
-                  (t
-                   (log-warn (format nil "not implemented yet. ~A" msg))))))))
+            do (cond ((message-name? msg JOB_CREATED)
+                      ;; nothing todo
+                      ;; (log-debug (format nil "job created: ~A" msg))
+                      )
+                     ((message-name? msg WORK_COMPLETE)
+                      ;; (log-debug (format nil "job complete: ~A" msg))
+                      (return (cadr (slot-value msg 'data))))
+                     ((message-name? msg WORK_FAIL)
+                      (restart-case (error 'job-failed :response msg)
+                        (retry-job ()
+                          :report (lambda (stream) (format stream "Retry the job."))
+                          (submit-job cli func :arg arg :priority priority))
+                        (accept-job ()
+                          :report (lambda (stream) (format stream "Continue, treating the job has successed."))
+                          (return nil))))
+                     (t
+                      (log-warn (format nil "not implemented yet. ~A" msg))))))))
 
 (defmethod submit-background-job ((cli client) func &key arg priority)
   "Submit job and return the job object immediately."
@@ -84,7 +91,7 @@ automatically discarded"
                                         ;            (log-debug (format nil "job created: ~A" msg))
               (job-created-message-to-job msg :name type :arg arg :uid uid))
             (restart-case (error (format nil "failed to create job: ~A" msg))
-              (retry ()
+              (retry-job ()
                 :report (lambda (stream) (format stream "Retry submitting the job."))
                 (submit-background-job cli func :arg arg :priority priority))))))))
 
